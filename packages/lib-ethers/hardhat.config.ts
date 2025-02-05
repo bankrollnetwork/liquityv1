@@ -12,6 +12,7 @@ import { ContractFactory, Overrides } from "@ethersproject/contracts";
 import { task, HardhatUserConfig, types, extendEnvironment } from "hardhat/config";
 import { HardhatRuntimeEnvironment, NetworkUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-verify";
 
 import { Decimal } from "@liquity/lib-base";
 
@@ -52,6 +53,7 @@ const generateRandomAccounts = (numberOfAccounts: number) => {
 
 const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey;
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
+const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const infuraApiKey = "ad9cef41c9c844a7b54d10be24d416e5";
 
@@ -65,7 +67,7 @@ const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => (
 // https://docs.chain.link/docs/ethereum-addresses
 // https://docs.tellor.io/tellor/integration/reference-page
 
-const oracleAddresses = {
+const oracleAddresses: Record<string, { chainlink: string; tellor: string }> = {
   mainnet: {
     chainlink: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
     tellor: "0x88dF592F8eb5D7Bd38bFeF7dEb0fBc02cf3778a0"
@@ -85,19 +87,28 @@ const oracleAddresses = {
   sepolia: {
     chainlink: "0x694AA1769357215DE4FAC081bf1f309aDC325306",
     tellor: "0x80fc34a2f9FfE86F41580F47368289C402DEc660"
+  },
+  bnb: {
+    chainlink: "0x20374E579832859f180536A69093A126Db1c8aE9",
+    tellor: zeroAddress
   }
 };
 
 const hasOracles = (network: string): network is keyof typeof oracleAddresses =>
   network in oracleAddresses;
 
-const wethAddresses = {
+const hasTellor =  (network: string): network is keyof typeof oracleAddresses =>  {
+  return hasOracles(network) && oracleAddresses[network as keyof typeof oracleAddresses].tellor !== zeroAddress;
+}
+
+const wethAddresses: Record<string, string> = {
   mainnet: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
   ropsten: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
   rinkeby: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
   goerli: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
   kovan: "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
-  sepolia: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14"
+  sepolia: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+  bnb: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 };
 
 const hasWETH = (network: string): network is keyof typeof wethAddresses => network in wethAddresses;
@@ -127,6 +138,7 @@ const config: HardhatUserConfig = {
     ...infuraNetwork("kovan"),
     ...infuraNetwork("sepolia"),
     ...infuraNetwork("mainnet"),
+    ...infuraNetwork("bnb"),
 
     kiln: {
       url: "https://rpc.kiln.themerge.dev",
@@ -221,7 +233,7 @@ task("deploy", "Deploys the contracts to the network")
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
       }
-
+      
       let wethAddress: string | undefined = undefined;
       if (createUniswapPair) {
         if (!hasWETH(env.network.name)) {
@@ -239,7 +251,7 @@ task("deploy", "Deploys the contracts to the network")
 
         assert(!_priceFeedIsTestnet(contracts.priceFeed));
 
-        if (hasOracles(env.network.name)) {
+        if (hasTellor(env.network.name)) {
           const tellorCallerAddress = await deployTellorCaller(
             deployer,
             getContractFactory(env),
@@ -249,9 +261,21 @@ task("deploy", "Deploys the contracts to the network")
 
           console.log(`Hooking up PriceFeed with oracles ...`);
 
-          const tx = await contracts.priceFeed.setAddresses(
+          const tx = await contracts.priceFeed.setAddresses( 
             oracleAddresses[env.network.name].chainlink,
             tellorCallerAddress,
+            overrides
+          );
+
+          await tx.wait();
+        } else {
+          //TODO: Add support for Chainlink only networks
+
+          console.log(`Hooking up PriceFeed with oracles ...`);
+
+          const tx = await contracts.priceFeed.setAddresses( 
+            oracleAddresses[env.network.name].chainlink,
+            zeroAddress,
             overrides
           );
 
