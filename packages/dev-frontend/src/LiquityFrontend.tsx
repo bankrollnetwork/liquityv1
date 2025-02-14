@@ -21,6 +21,7 @@ import { StabilityViewProvider } from "./components/Stability/context/StabilityV
 import { StakingViewProvider } from "./components/Staking/context/StakingViewProvider";
 import "tippy.js/dist/tippy.css"; // Tooltip default style
 import { BondsProvider } from "./components/Bonds/context/BondsProvider";
+import { Dashboard } from "./pages/Dashboard";
 
 type LiquityFrontendProps = {
   loader?: React.ReactNode;
@@ -66,6 +67,9 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
                       <Route path="/" exact>
                         <PageSwitcher />
                       </Route>
+                      <Route path="/dashboard">
+                        <Dashboard />
+                      </Route>  
                       <Route path="/bonds">
                         <Bonds />
                       </Route>

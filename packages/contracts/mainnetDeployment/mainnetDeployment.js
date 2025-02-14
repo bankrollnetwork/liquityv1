@@ -1,6 +1,5 @@
 const { UniswapV2Factory } = require("./ABIs/UniswapV2Factory.js")
 const { UniswapV2Pair } = require("./ABIs/UniswapV2Pair.js")
-const { UniswapV2Router02 } = require("./ABIs/UniswapV2Router02.js")
 const { ChainlinkAggregatorV3Interface } = require("./ABIs/ChainlinkAggregatorV3Interface.js")
 const { TestHelper: th, TimeValues: timeVals } = require("../utils/testHelpers.js")
 const { dec } = th
@@ -11,7 +10,7 @@ async function mainnetDeploy(configParams) {
   const date = new Date()
   console.log(date.toUTCString())
   const deployerWallet = (await ethers.getSigners())[0]
-  // const account2Wallet = (await ethers.getSigners())[1]
+  
   const mdh = new MainnetDeploymentHelper(configParams, deployerWallet)
   const gasPrice = configParams.GAS_PRICE
 
@@ -19,7 +18,6 @@ async function mainnetDeploy(configParams) {
 
   console.log(`deployer address: ${deployerWallet.address}`)
   assert.equal(deployerWallet.address, configParams.liquityAddrs.DEPLOYER)
-  // assert.equal(account2Wallet.address, configParams.beneficiaries.ACCOUNT_2)
   let deployerETHBalance = await ethers.provider.getBalance(deployerWallet.address)
   console.log(`deployerETHBalance before: ${deployerETHBalance}`)
 
@@ -82,15 +80,15 @@ async function mainnetDeploy(configParams) {
   // Deploy a read-only multi-trove getter
   const multiTroveGetter = await mdh.deployMultiTroveGetterMainnet(liquityCore, deploymentState)
 
-  // Connect Unipool to LQTYToken and the LUSD-WETH pair address, with a 6 week duration
-  const LPRewardsDuration = timeVals.SECONDS_IN_SIX_WEEKS
+  // Connect Unipool to LQTYToken and the LUSD-WETH pair address, with a 48 week duration
+  const LPRewardsDuration = timeVals.SECONDS_IN_ONE_MONTH * 48
   await mdh.connectUnipoolMainnet(unipool, LQTYContracts, LUSDWETHPairAddr, LPRewardsDuration)
 
   // Log LQTY and Unipool addresses
   await mdh.logContractObjects(LQTYContracts)
   console.log(`Unipool address: ${unipool.address}`)
   
-  // let latestBlock = await ethers.provider.getBlockNumber()
+  // Get the deployment start time from the LQTYToken
   let deploymentStartTime = await LQTYContracts.lqtyToken.getDeploymentStartTime()
 
   console.log(`deployment start time: ${deploymentStartTime}`)
@@ -158,11 +156,13 @@ async function mainnetDeploy(configParams) {
   let chainlinkPrice = await chainlinkProxy.latestAnswer()
   console.log(`current Chainlink price: ${chainlinkPrice}`)
 
-  // Check Tellor price directly (through our TellorCaller)
-  let tellorPriceResponse = await liquityCore.tellorCaller.getTellorCurrentValue(1) // id == 1: the ETH-USD request ID
-  console.log(`current Tellor price: ${tellorPriceResponse[1]}`)
-  console.log(`current Tellor timestamp: ${tellorPriceResponse[2]}`)
-
+  // Check Tellor price directly (through our TellorCaller if available)
+  if (configParams.externalAddrs.TELLOR_MASTER != th.ZERO_ADDRESS) {
+    let tellorPriceResponse = await liquityCore.tellorCaller.getTellorCurrentValue(1) // id == 1: the ETH-USD request ID
+    console.log(`current Tellor price: ${tellorPriceResponse[1]}`)
+    console.log(`current Tellor timestamp: ${tellorPriceResponse[2]}`)
+  }
+  
   // // --- Lockup Contracts ---
   console.log("LOCKUP CONTRACT CHECKS")
   // Check lockup contracts exist for each beneficiary with correct unlock time

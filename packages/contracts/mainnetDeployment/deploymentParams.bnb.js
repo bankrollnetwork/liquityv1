@@ -1,0 +1,67 @@
+const zeroAddress = "0x0000000000000000000000000000000000000000";
+
+const externalAddrs  = {
+  // https://data.chain.link/streams/bnb-usd
+  CHAINLINK_ETHUSD_PROXY: "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE", 
+  // https://docs.tellor.io/tellor/integration/reference-page
+  TELLOR_MASTER: zeroAddress,
+  //https://docs.pancakeswap.finance/developers/smart-contracts/pancakeswap-exchange/v2-contracts/router-v2
+  UNISWAP_V2_FACTORY: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
+  UNISWAP_V2_ROUTER02: "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+  WETH_ERC20: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c ",
+}
+
+const liquityAddrs = {
+  GENERAL_SAFE:"0xa84A2cd318859747Ea06abddE904624908624785", // to be passed to LQTYToken as the bounties/hackathons address
+  LQTY_SAFE:"0xD5D3711939d88322a7DCeEB529ACE4BAc3BAc644", // to be passed to LQTYToken as the LQTY multisig address
+  DEPLOYER: "0x6E4A0c4864d6aF9cd532E07107A5C7637161Eb8E" // Mainnet REAL deployment address
+}
+
+// Beneficiaries for lockup contracts. 
+const beneficiaries = {
+  ACCOUNT_1: "0x8b71451681500a49d1e82e617a13898dfae91e7b",  
+  ACCOUNT_2: "0x222404330dA9326c99c6b1Fdc34e6Cb5245a746A",
+  ACCOUNT_3: "0x436243bddc8f330b474783e4f7a55a766dc1ab31",
+  ACCOUNT_4: "0x0D024655c05189faBEa447Da2f2455c2db518C98",
+  ACCOUNT_5: "0x53b9f0C3583753b68bF2913b3EE9b48074aAeA5E",
+  ACCOUNT_6: "0xcA4653Fae06663E63600D1328D3e10BDFE14838C",
+  ACCOUNT_7: "0xD6D954b78a108De6b5Ff48E9028eE55F48615177",
+  ACCOUNT_8: "0x9B1e267D457F5ed28cce0D79e7a2dd28BDE0EA0E",
+  ACCOUNT_9: "0xEc31176d4df0509115abC8065A8a3F8275aafF2b",
+  ACCOUNT_10: "0x840e3800308cf7c33066aa293f457ff045c7c573",
+  ACCOUNT_11: "0xF443Ad1c5184F88E0282284504A2746d8747a8A9",
+  ACCOUNT_12: "0x23ab825AAFFE678F6473133f7A7A90AB49f5B391",
+  ACCOUNT_13: "0x2E7de276D6a243d3467E05C7482Cc6AFf8aF13AC",
+  ACCOUNT_14: "0xcB71EB21F53a2F4de0F26dc90518Df10Be13D1EC",
+  ACCOUNT_15: "0x16E76819aC1f0dfBECc48dFE93B198830e0C85EB",
+  ACCOUNT_16: "0xb1870B83B5431C6FDC2d56c6c1AF75C3a8f41627",
+  ACCOUNT_17: "0x08f5fd1dc1413444cb68862db47b055deb8e5a49",
+  ACCOUNT_18: "0xfa24222639866B51A4c4eF8C28eF743CCb2B6c71",
+  ACCOUNT_19: "0x090667733a8df9a802d90b6d2a9856b21cc02182",
+  ACCOUNT_20: "0xf6431Eb64aa56A6378842E9295614e614c3070A4",
+  ACCOUNT_21: "0xAFB57712d39bf80BdBD25C0c5F629C28A028DCc8",
+  ACCOUNT_22: "0x43143fdd3aeB9ad012778E490866B3BED476E375",
+}
+
+const OUTPUT_FILE = './mainnetDeployment/bnbDeploymentOutput.json'
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+const waitFunction = async () => {
+  return delay(10000) // wait 10s
+}
+
+const GAS_PRICE = 1100000000 // 1.1 Gwei
+const TX_CONFIRMATIONS = 3
+
+const ETHERSCAN_BASE_URL = 'https://bscscan.com/address/'
+
+module.exports = {
+  externalAddrs,
+  liquityAddrs,
+  beneficiaries,
+  OUTPUT_FILE,
+  waitFunction,
+  GAS_PRICE,
+  TX_CONFIRMATIONS,
+  ETHERSCAN_BASE_URL,
+};

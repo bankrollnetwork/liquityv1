@@ -24,17 +24,17 @@ import "../Dependencies/console.sol";
 *
 * 2) sendToLQTYStaking(): callable only by Liquity core contracts, which move LQTY tokens from user -> LQTYStaking contract.
 *
-* 3) Supply hard-capped at 100 million
+* 3) Supply hard-capped at 1 billion tokens
 *
 * 4) CommunityIssuance and LockupContractFactory addresses are set at deployment
 *
-* 5) The bug bounties / hackathons allocation of 2 million tokens is minted at deployment to an EOA
+* 5) The bug bounties / hackathons / airdrops allocation of 100 million tokens is minted at deployment to an EOA
 
-* 6) 32 million tokens are minted at deployment to the CommunityIssuance contract
+* 6) 700 million tokens are minted at deployment to the CommunityIssuance contract
 *
-* 7) The LP rewards allocation of (1 + 1/3) million tokens is minted at deployent to a Staking contract
+* 7) The LP rewards allocation of 100 million tokens is minted at deployent to a Staking contract
 *
-* 8) (64 + 2/3) million tokens are minted at deployment to the Liquity multisig
+* 8) 100 million tokens are minted at deployment to the Liquity multisig
 *
 * 9) Until one year from deployment:
 * -Liquity multisig may only transfer() tokens to LockupContracts that have been deployed via & registered in the 
@@ -52,8 +52,8 @@ contract LQTYToken is CheckContract, ILQTYToken {
 
     // --- ERC20 Data ---
 
-    string constant internal _NAME = "LQTY";
-    string constant internal _SYMBOL = "LQTY";
+    string constant internal _NAME = "KUDU";
+    string constant internal _SYMBOL = "KUDU";
     string constant internal _VERSION = "1";
     uint8 constant internal  _DECIMALS = 18;
 
@@ -83,7 +83,7 @@ contract LQTYToken is CheckContract, ILQTYToken {
     uint public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
 
     // uint for use with SafeMath
-    uint internal _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
+    uint internal _100_MILLION = 1e26;    // 1e2 * 1e6 * 1e18 = 1e26 (100 million)
 
     uint internal immutable deploymentStartTime;
     address public immutable multisigAddress;
@@ -135,18 +135,18 @@ contract LQTYToken is CheckContract, ILQTYToken {
         
         // --- Initial LQTY allocations ---
      
-        uint bountyEntitlement = _1_MILLION.mul(2); // Allocate 2 million for bounties/hackathons
+        uint bountyEntitlement = _100_MILLION; // Allocate 100 million for bounties/hackathons/airdrops
         _mint(_bountyAddress, bountyEntitlement);
 
-        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(32); // Allocate 32 million to the algorithmic issuance schedule
+        uint depositorsAndFrontEndsEntitlement = _100_MILLION.mul(7); // Allocate 700 million to the algorithmic issuance schedule
         _mint(_communityIssuanceAddress, depositorsAndFrontEndsEntitlement);
 
-        uint _lpRewardsEntitlement = _1_MILLION.mul(4).div(3);  // Allocate 1.33 million for LP rewards
+        uint _lpRewardsEntitlement = _100_MILLION;  // Allocate 100 million for LP rewards
         lpRewardsEntitlement = _lpRewardsEntitlement;
         _mint(_lpRewardsAddress, _lpRewardsEntitlement);
         
-        // Allocate the remainder to the LQTY Multisig: (100 - 2 - 32 - 1.33) million = 64.66 million
-        uint multisigEntitlement = _1_MILLION.mul(100)
+        // Allocate the remainder to the LQTY Multisig: (1000 - 100 - 700 - 100) million = 100 million
+        uint multisigEntitlement = _100_MILLION.mul(10) // 1 billion
             .sub(bountyEntitlement)
             .sub(depositorsAndFrontEndsEntitlement)
             .sub(_lpRewardsEntitlement);

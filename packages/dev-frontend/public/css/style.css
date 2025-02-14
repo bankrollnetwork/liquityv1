@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #00c8ff;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+section {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+.btn {
+    background: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+}
+
+#hero {
+    background-image: url('hero-image.jpg'); /* Replace with your image */
+    background-size: cover;
+    height: 500px; /* Adjust as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-container {
+    display: flex;                /* Enable flexbox layout */
+    align-items: center;        /* Vertically align items */
+    justify-content: space-around; /* Horizontal spacing */
+    /* Add padding or margin as needed */
+    padding: 20px;
+}
+
+.hero-image {
+    width: 40%; /* Adjust width as needed */
+}
+
+.hero-image img {
+    width: 100%; /* Make image fill its container */
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Prevent extra spacing below image*/
+}
+
+.hero-content {
+    width: 50%; /* Adjust width as needed */
+    text-align: left;  /* Or center, depending on your design */
+}
+
+.btn {
+    /* Style your button */
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
